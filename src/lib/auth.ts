@@ -3,6 +3,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import { sendVerificationEmail, sendPasswordResetEmail } from './email';
 import { db } from "@/db/db";
+import { verification } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -19,9 +21,21 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendVerificationEmail: async ({ user, url, token }, request) => {
+    sendVerificationEmail: async ({ user, url, token }) => {
       // Generate a random 6-digit code
       const code = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Clean up any existing verification codes for this email
+      await db.delete(verification).where(eq(verification.identifier, user.email));
+      
+      // Store the new verification code
+      await db.insert(verification).values({
+        id: crypto.randomUUID(),
+        identifier: user.email,
+        value: code,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes expiry
+      });
+      
       await sendVerificationEmail(user.email, code);
     },
   },
