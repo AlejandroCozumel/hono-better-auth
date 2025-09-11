@@ -5,6 +5,7 @@ import { db } from "@/db/db";
 import { verification, user } from "@/db/schema";
 import { eq, and, gt, lt } from "drizzle-orm";
 import { rateLimiter } from "hono-rate-limiter";
+import { todos } from "@/routes/todos.routes";
 
 const app = new Hono();
 
@@ -38,8 +39,9 @@ setInterval(cleanupExpiredVerifications, 60 * 60 * 1000);
 
 app
   .on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw))
-  .get("/", (c) => {
-    return c.text("Hello Hono! Better Auth with Resend is ready!");
+  .route('/api/todos', todos)
+  .get('/', (c) => {
+    return c.text('Hello Hono!');
   })
   .post("/test-email", async (c) => {
     try {
