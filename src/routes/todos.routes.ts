@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { authMiddleware } from '../middlewares/auth.middleware';
-import { getTodosByUserId, insertTodo } from '../db/queries';
-import type { HonoEnv } from '../types';
+import { getTodosByUserId, insertTodo } from '../db/queries/todos';
+import type { HonoEnv } from '../types/auth';
 import { createTodoValidator } from '../validators/create-todo.validator';
 
 export const todos = new Hono<HonoEnv>();
