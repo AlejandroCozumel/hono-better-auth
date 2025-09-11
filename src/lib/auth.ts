@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, bearer } from "better-auth/plugins";
 import { sendVerificationEmail, sendPasswordResetEmail } from './email';
 import { db } from "@/db/db";
 import { verification } from "@/db/schema";
@@ -45,5 +45,5 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
-  plugins: [openAPI()],
+  plugins: [openAPI(), bearer()],
 });

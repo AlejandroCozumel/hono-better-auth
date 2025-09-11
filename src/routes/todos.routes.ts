@@ -1,14 +1,14 @@
-import { Hono } from 'hono';
+import { OpenAPIHono } from '@hono/zod-openapi';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { getTodosByUserId, insertTodo } from '../db/queries/todos';
 import type { HonoEnv } from '../types/auth';
-import { createTodoValidator } from '../validators/create-todo.validator';
+import { getTodosRoute, createTodoRoute } from '../schemas/todo.schemas';
 
-export const todos = new Hono<HonoEnv>();
+export const todos = new OpenAPIHono<HonoEnv>();
 
 todos.use(authMiddleware);
 
-todos.get('/', async (c) => {
+todos.openapi(getTodosRoute, async (c) => {
   const user = c.get('user');
 
   try {
@@ -20,7 +20,7 @@ todos.get('/', async (c) => {
   }
 });
 
-todos.post('/', createTodoValidator, async (c) => {
+todos.openapi(createTodoRoute, async (c) => {
   const user = c.get('user');
   const todoData = c.req.valid('json');
 
